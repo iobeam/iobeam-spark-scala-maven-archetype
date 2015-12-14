@@ -1,7 +1,7 @@
 package com.iobeam.spark.streams
 
 import com.iobeam.spark.streams.config.{DeviceConfig, SeriesConfig}
-import com.iobeam.spark.streams.model.{TimeSeriesStream, DataSet, OutputStreams}
+import com.iobeam.spark.streams.model.{TimeSeriesStreamPartitioned, DataSet, OutputStreams}
 import org.apache.spark.streaming.dstream.DStream
 
 /**
@@ -9,15 +9,14 @@ import org.apache.spark.streaming.dstream.DStream
   *
   */
 
-class StreamProcessor(projectId: Long) extends SparkApp("MyAppName", projectId) {
+class StreamProcessor() extends SparkApp("MyAppName") {
 
-    def add1(dataAndConf: (DataSet, DeviceConfig)): (DataSet, DeviceConfig) = {
-
+    def add1(dataAndConf: (DataSet, DeviceConfig)): DataSet = {
         val (dataSet, conf) = dataAndConf
-        val newValue = dataSet.getData("value").asInstanceOf[Int] + 1
+        val newValue = dataSet.requireDouble("value") + 1
         val outputData = new DataSet(dataSet.time, Map("value" -> newValue))
 
-        (outputData, conf)
+        outputData
     }
 
     override def processStream(stream: DStream[(String, (DataSet, DeviceConfig))]):
@@ -25,12 +24,6 @@ class StreamProcessor(projectId: Long) extends SparkApp("MyAppName", projectId) 
 
         val outStream = stream.mapValues(add1)
 
-        new OutputStreams(Seq(new TimeSeriesStream("out_stream", outStream)), Seq())
+        new OutputStreams(new TimeSeriesStreamPartitioned("out_stream", outStream))
     }
-
-    override def getConfigs: Seq[SeriesConfig] = {
-        Seq()
-    }
-
-    override def usedTimeSeriesNames: Seq[DataSet.DataKey] = Seq("value")
 }

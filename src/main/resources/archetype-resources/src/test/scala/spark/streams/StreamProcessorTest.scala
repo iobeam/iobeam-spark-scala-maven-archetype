@@ -16,8 +16,8 @@ import scala.collection.mutable.ListBuffer
 /**
   * Example test code for an iobeam spark streaming app
   */
-class TestDataSet(time: Long, val value: Int) extends DataSet(time, Map("value" -> value)) {
-    def getValue: Int = value
+class TestDataSet(override val time: Long, val value: Double) extends DataSet(time, Map("value" -> value)) {
+    def getValue: Double = value
 }
 
 class StreamProcessorTest extends FlatSpec with SparkStreamingSpec with Matchers with
@@ -59,7 +59,7 @@ BeforeAndAfter with GivenWhenThen with Eventually {
 
         Given("streaming context is initialized")
         val batchQueue = mutable.Queue[RDD[DataSet]]()
-        val results = ListBuffer.empty[List[(Long, Int)]]
+        val results = ListBuffer.empty[List[(Long, Double)]]
 
         // Create the QueueInputDStream and use it do some processing
         val inputStream = ssc.queueStream(batchQueue)
@@ -68,16 +68,16 @@ BeforeAndAfter with GivenWhenThen with Eventually {
         val deviceDatasetConf = inputStream.map(a => ("TestDevice", (a, new DeviceConfig(""))))
 
         // Setup the processing app, the projectId is not relevant
-        val app = new StreamProcessor(1L)
+        val app = new StreamProcessor()
 
         // Get the output from the app
         val outputStreams = app.processStream(deviceDatasetConf)
         val firstOutput = outputStreams.getTimeSeries.head
 
         // Catch the resulting RDDs and convert it to tuples for easy comparisons
-        firstOutput.dstream.foreachRDD {
+        firstOutput.getDStream.foreachRDD {
             rdd => results.append(
-                rdd.map(a => (a._2._1.time, a._2._1.getData("value").asInstanceOf[Int]))
+                rdd.map(a => (a._2.time, a._2.requireDouble("value")))
                     .collect().toList)
         }
 
@@ -86,8 +86,8 @@ BeforeAndAfter with GivenWhenThen with Eventually {
         ssc.start()
 
         for ((batch, i) <- batches.zipWithIndex) {
-            clock.advance(1000)
             batchQueue += ssc.sparkContext.makeRDD(batch)
+            clock.advance(1000)
             eventually {
                 results.length should equal(i + 1)
             }
