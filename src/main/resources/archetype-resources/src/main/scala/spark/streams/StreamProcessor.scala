@@ -1,4 +1,4 @@
-package com.iobeam.spark.streams
+package ${package}.streams
 
 import com.iobeam.spark.streams.config.{DeviceConfig, SeriesConfig}
 import com.iobeam.spark.streams.model.{TimeSeriesStreamPartitioned, DataSet, OutputStreams}
@@ -9,7 +9,7 @@ import org.apache.spark.streaming.dstream.DStream
   *
   */
 
-class StreamProcessor() extends SparkApp("MyAppName") {
+class StreamProcessor() extends SparkApp(${appName}) {
 
     def add1(dataAndConf: (DataSet, DeviceConfig)): DataSet = {
         val (dataSet, conf) = dataAndConf
