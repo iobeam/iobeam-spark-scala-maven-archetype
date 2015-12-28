@@ -19,6 +19,7 @@ Define value for property 'groupId': : com.mycompany
 Define value for property 'artifactId': : myappId
 Define value for property 'version':  1.0-SNAPSHOT: : [Enter for default] 
 Define value for property 'package':  com.mycompany: : [Enter for default] 
+Define value for property 'appName': : MyAppName
 Confirm properties configuration:
 groupId: com.mycompany
 artifactId: myappId

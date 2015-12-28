@@ -1,6 +1,6 @@
 package org.apache.spark
 
-import com.iobeam.spark.streams.StreamProcessor
+import {package}.streams.StreamProcessor
 import com.iobeam.spark.streams.config.DeviceConfig
 import com.iobeam.spark.streams.model.DataSet
 import org.apache.spark.rdd.RDD
