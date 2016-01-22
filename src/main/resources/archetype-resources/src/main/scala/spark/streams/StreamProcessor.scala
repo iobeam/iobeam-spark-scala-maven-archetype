@@ -1,7 +1,7 @@
-package ${package}.streams
+package com.iobeam.spark.streams
 
-import com.iobeam.spark.streams.config.{DeviceConfig, SeriesConfig}
-import com.iobeam.spark.streams.model.{TimeSeriesStreamPartitioned, DataSet, OutputStreams}
+import com.iobeam.spark.streams.config.DeviceConfig
+import com.iobeam.spark.streams.model.{TimeSeriesStreamPartitioned, OutputStreams, TimeRecord}
 import org.apache.spark.streaming.dstream.DStream
 
 /**
@@ -11,15 +11,15 @@ import org.apache.spark.streaming.dstream.DStream
 
 class StreamProcessor() extends SparkApp(${appName}) {
 
-    def add1(dataAndConf: (DataSet, DeviceConfig)): DataSet = {
-        val (dataSet, conf) = dataAndConf
-        val newValue = dataSet.requireDouble("value") + 1
-        val outputData = new DataSet(dataSet.time, Map("value" -> newValue))
+    def add1(dataAndConf: (TimeRecord, DeviceConfig)): TimeRecord = {
+        val (timeRecord, _) = dataAndConf
+        val newValue = timeRecord.requireDouble("value") + 1
+        val outputData = new TimeRecord(timeRecord.time, Map("value" -> newValue))
 
         outputData
     }
 
-    override def processStream(stream: DStream[(String, (DataSet, DeviceConfig))]):
+    override def processStream(stream: DStream[(String, (TimeRecord, DeviceConfig))]):
     OutputStreams = {
 
         val outStream = stream.mapValues(add1)

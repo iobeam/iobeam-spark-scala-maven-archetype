@@ -1,20 +1,29 @@
 # Introduction
-iobeam supports [Apache Spark](http://spark.apache.org/) apps for data analysis. Writing and deploying iobeam Spark apps
-allows users to process their data in a variety of ways, from simple rule-based models to more complex prediction,
-anomaly detection, classification, and other ML-driven models. The output of an iobeam Spark app can be a new
-stream of derived data, or an event to trigger an action using our Trigger service.
+iobeam supports [Apache Spark](http://spark.apache.org/) apps
+for data analysis. Writing and deploying iobeam Spark apps allows users to
+process their data in a variety of ways, from simple rule-based models to more
+complex prediction, anomaly detection, classification, and other ML-driven
+models. The output of an iobeam Spark app can be a new stream of derived data,
+or an event to trigger an action using our Trigger service.
 
-This repo describes how to write an iobeam Spark app. [The full reference API can be found here](http://docs.iobeam.com/lib/analyze/#com.iobeam.spark.streams.package).
+This repo describes how to write an iobeam Spark app. [The full reference API
+can be found
+here](http://docs.iobeam.com/lib/analyze/#com.iobeam.spark.streams.package).
 
 # Writing your first iobeam Spark app
-The first step to develop a custom iobeam Spark app is to set up up a Scala app with the right Spark and iobeam dependencies. To automate this, iobeam provides a [Maven archetype](https://maven.apache.org/guides/introduction/introduction-to-archetypes.html) that gives you framework code and dependencies such as iobeam libraries and a unit test framework.
+The first step to develop a custom iobeam
+Spark app is to set up up a Scala app with the right Spark and iobeam
+dependencies. To automate this, iobeam provides a [Maven
+archetype](https://maven.apache.org/guides/introduction/introduction-to-archetypes.html)
+that gives you framework code and dependencies such as iobeam libraries and a
+unit test framework.
 
 ## Setup
 
 ### Prerequisites
 * A recent [Maven installation](https://maven.apache.org/download.cgi#Installation)
 * Scala 2.10
-* JDK 1.8 
+* JDK 8 
 
 ### Creating an App
 
@@ -23,7 +32,8 @@ To set up the iobeam Spark app, you run the following command from your command-
 ```
 mvn archetype:generate -DarchetypeArtifactId=Spark-app-maven-archetype -DarchetypeGroupId=com.iobeam
 ```
-Maven will ask for information unique to your app. At the minimum, you should set `groupId`, `artifactId`, and `appName`.
+Maven will ask for information unique to your app. At the minimum, you should set `groupId`,
+`artifactId`, and `appName`.
 
 ```
 Define value for property 'groupId': : com.mycompany
@@ -74,22 +84,24 @@ src/test/scala/com/mycompany/Spark/streams/StreamProcessorTest.scala
 ```
 
 ### Analysis code
-The analysis of the streaming data is defined in ```StreamProcessor.scala```. The main function is the `processStream` method, which you will need to override. 
+The analysis of the streaming data is defined in ```StreamProcessor.scala```. The main
+function is the `processStream` method, which you will need to override. 
 
-The example code provided simply adds 1 to all values coming through the stream processing, creating a new output stream. (For more complex examples, see the [iobeam examples repo](LINKTOEXAMPLES).)
+The example code provided simply adds 1 to all values coming through the stream processing,
+creating a new output stream. (For more complex examples, see the [iobeam examples repo](https://github.com/iobeam/iobeam-spark-scala-examples).)
 
 ```
 class StreamProcessor() extends SparkApp("MyAppName") {
 
-    def add1(dataAndConf: (DataSet, DeviceConfig)): DataSet = {
-        val (dataSet, conf) = dataAndConf
-        val newValue = dataSet.requireDouble("value") + 1
-        val outputData = new DataSet(dataSet.time, Map("value" -> newValue))
+    def add1(dataAndConf: (TimeRecord, DeviceConfig)): TimeRecord = {
+        val (timeRecord, _) = dataAndConf
+        val newValue = timeRecord.requireDouble("value") + 1
+        val outputData = new TimeRecord(timeRecord.time, Map("value" -> newValue))
 
         outputData
     }
 
-    override def processStream(stream: DStream[(String, (DataSet, DeviceConfig))]):
+    override def processStream(stream: DStream[(String, (TimeRecord, DeviceConfig))]):
     OutputStreams = {
 
         val outStream = stream.mapValues(add1)
@@ -101,11 +113,17 @@ class StreamProcessor() extends SparkApp("MyAppName") {
 ```
 
 ### Test code
-To help development, the Scala test framework is included in the app together with Spark and Spark streaming specs. 
+To help development, the Scala test framework is included in the
+app together with Spark and Spark streaming specs.
 
-Modify  ```src/test/scala/com/mycompany/Spark/streams/StreamProcessorTest.scala```  to match your new analysis code. The TestDataSet is used for easy initialisation of test data and can be extended to match the data format of the iobeam app. 
+Modify
+```src/test/scala/com/mycompany/Spark/streams/StreamProcessorTest.scala``` to
+match your new analysis code. The TestDataSet is used for easy initialization
+of test data and can be extended to match the data format of the iobeam app.
 
-To use the test framework with new analysis code, the ```batches``` list needs to be initialised with new input batches and the ```correctOutput```list needs to contain the expected output.
+To use the test framework with new analysis code, the ```batches``` list needs
+to be initialised with new input batches and the ```correctOutput```list needs
+to contain the expected output.
 
 ```
 class StreamProcessorTest extends FlatSpec with SparkStreamingSpec with Matchers with
