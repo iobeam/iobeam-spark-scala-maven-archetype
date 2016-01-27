@@ -1,7 +1,7 @@
 #set( $symbol_pound = '#' )
-#set( $symbol_dollar = '$' )
-#set( $symbol_escape = '\' )
-<?xml version="1.0" encoding="UTF-8"?>
+        #set( $symbol_dollar = '$' )
+        #set( $symbol_escape = '\' )
+        <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
@@ -9,7 +9,7 @@
         </Console>
     </Appenders>
     <Loggers>
-      <Logger name="org.apache.log4j" level="info"/>
+        <Logger name="org.apache.log4j" level="info"/>
         <Logger name="${package}" level="info"/>
         <Logger name="${groupId}" level="debug"/>
         <Root level="warn">

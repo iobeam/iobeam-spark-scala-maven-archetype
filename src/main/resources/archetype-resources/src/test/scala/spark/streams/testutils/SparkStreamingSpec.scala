@@ -1,8 +1,9 @@
 package spark.streams.testutils
 
 import java.nio.file.Files
-import org.apache.spark.streaming._
-import org.scalatest._
+
+import org.apache.spark.streaming.{ClockWrapper, Seconds, StreamingContext}
+import org.scalatest.Suite
 
 /**
   * http://mkuthan.github.io/blog/2015/03/01/spark-unit-testing/

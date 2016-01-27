@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,8 +16,7 @@
         <url>http://www.iobeam.com/</url>
     </organization>
 
-    <inceptionYear>2014</inceptionYear>
-
+    <inceptionYear>2016</inceptionYear>
 
     <build>
         <resources>
@@ -110,7 +111,6 @@
             <artifactId>spark-streaming_2.10</artifactId>
             <version>${spark.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
@@ -125,8 +125,8 @@
         </dependency>
         <dependency>
             <groupId>com.iobeam</groupId>
-            <artifactId>spark-iobeam-lib</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <artifactId>iobeam-spark-scala</artifactId>
+            <version>0.1</version>
         </dependency>
     </dependencies>
 

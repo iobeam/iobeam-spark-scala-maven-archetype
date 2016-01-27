@@ -3,16 +3,43 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.iobeam</groupId>
-    <artifactId>spark-app-maven-archetype</artifactId>
+    <artifactId>iobeam-spark-scala-maven-archetype</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>maven-archetype</packaging>
 
-    <name>spark-app-maven-archetype</name>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <url>http://www.iobeam.com/</url>
+    <description>
+        Maven archetype to set up an iobeam spark app project.
+    </description>
+
+    <inceptionYear>2016</inceptionYear>
+
+    <organization>
+        <name>440 Labs, Inc.</name>
+        <url>http://www.iobeam.com/</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>iobeam</name>
+            <email>hello@iobeam.com</email>
+            <organization>iobeam</organization>
+            <organizationUrl>https://www.iobeam.com</organizationUrl>
+        </developer>
+    </developers>
 
     <scm>
-        <url>https://bitbucket.org/440-labs/spark-app-maven-archetype</url>
-        <connection>scm:git:ssh://git@bitbucket.org/440-labs/spark-app-maven-archetype.git</connection>
-        <developerConnection>scm:git:ssh://git@bitbucket.org/440-labs/spark-app-maven-archetype.git
+        <url>https://bitbucket.org/440-labs/iobeam-spark-maven-archetype</url>
+        <connection>scm:git:ssh://git@bitbucket.org/440-labs/iobeam-spark-maven-archetype.git</connection>
+        <developerConnection>scm:git:ssh://git@bitbucket.org/440-labs/iobeam-spark-maven-archetype.git
         </developerConnection>
         <tag>HEAD</tag>
     </scm>
@@ -29,6 +56,7 @@
             <url>https://artifactory.iobeam.com/artifactory/libs-snapshot-local</url>
         </snapshotRepository>
     </distributionManagement>
+
     <build>
         <plugins>
             <plugin>
