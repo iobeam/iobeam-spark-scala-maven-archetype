@@ -37,9 +37,9 @@
     </developers>
 
     <scm>
-        <url>https://bitbucket.org/440-labs/iobeam-spark-maven-archetype</url>
-        <connection>scm:git:ssh://git@bitbucket.org/440-labs/iobeam-spark-maven-archetype.git</connection>
-        <developerConnection>scm:git:ssh://git@bitbucket.org/440-labs/iobeam-spark-maven-archetype.git
+        <url>https://bitbucket.org/440-labs/iobeam-spark-scala-maven-archetype</url>
+        <connection>scm:git:ssh://git@bitbucket.org/440-labs/iobeam-spark-scala-maven-archetype.git</connection>
+        <developerConnection>scm:git:ssh://git@bitbucket.org/440-labs/iobeam-spark-scala-maven-archetype.git
         </developerConnection>
         <tag>HEAD</tag>
     </scm>
