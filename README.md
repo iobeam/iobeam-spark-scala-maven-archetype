@@ -30,7 +30,7 @@ unit test framework.
 To set up the iobeam Spark app, you run the following command from your command-line:
 
 ```
-mvn archetype:generate -DarchetypeArtifactId=Spark-app-maven-archetype -DarchetypeGroupId=com.iobeam
+mvn archetype:generate -DarchetypeArtifactId=iobeam-spark-scala-maven-archetype -DarchetypeGroupId=com.iobeam
 ```
 Maven will ask for information unique to your app. At the minimum, you should set `groupId`,
 `artifactId`, and `appName`.

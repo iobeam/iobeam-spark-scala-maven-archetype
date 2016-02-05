@@ -9,7 +9,7 @@ import org.apache.spark.streaming.dstream.DStream
   *
   */
 
-class StreamProcessor() extends SparkApp(${appName}) {
+class StreamProcessor() extends SparkApp("${appName}") {
 
     def add1(dataAndConf: (TimeRecord, DeviceConfig)): TimeRecord = {
         val (timeRecord, _) = dataAndConf
