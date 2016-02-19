@@ -62,13 +62,13 @@ class StreamProcessorTest extends FlatSpec with Matchers with SparkStreamingSpec
         // Create the QueueInputDStream and use it do some processing
         val inputStream = ssc.queueStream(batchQueue)
 
-        // The deviceId is not use in this example and neither is device config
+        // The deviceId is not use in this example
         val deviceTimeRecord = inputStream.map(a => ("TestDevice", a))
 
         // Get an iobeam interface for local use
         val interface = new AppRunnerInterface(deviceTimeRecord)
 
-        // Setup the processing app, the projectId is not relevant
+        // Setup the processing app
         val app = new StreamProcessor()
 
         // Get the output from the app

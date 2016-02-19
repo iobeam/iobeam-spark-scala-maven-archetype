@@ -21,6 +21,6 @@ class StreamProcessor() extends SparkApp("${appName}") {
         val stream = iobeamInterface.getInputStreamBySource
         val outStream = stream.mapValues(add1)
 
-        new OutputStreams(new TimeSeriesStreamPartitioned("out_stream", outStream))
+        new OutputStreams(new TimeSeriesStreamPartitioned(outStream))
     }
 }
