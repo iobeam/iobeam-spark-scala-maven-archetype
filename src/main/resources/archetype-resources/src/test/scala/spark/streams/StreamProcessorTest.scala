@@ -1,13 +1,12 @@
 package org.apache.spark
 
-import com.iobeam.spark.streams.StreamProcessor
-import com.iobeam.spark.streams.config.DeviceConfig
+import com.iobeam.spark.streams.{AppRunnerInterface, StreamProcessor}
 import com.iobeam.spark.streams.model.TimeRecord
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.ClockWrapper
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
-import org.scalatest.{BeforeAndAfter, FlatSpec, GivenWhenThen, Matchers}
+import org.scalatest.{FlatSpec, GivenWhenThen, Matchers}
 import spark.streams.testutils.SparkStreamingSpec
 
 import scala.collection.mutable
@@ -63,14 +62,17 @@ class StreamProcessorTest extends FlatSpec with Matchers with SparkStreamingSpec
         // Create the QueueInputDStream and use it do some processing
         val inputStream = ssc.queueStream(batchQueue)
 
-        // The deviceId is not use in this example and neither is device config
-        val deviceTimeRecordConf = inputStream.map(a => ("TestDevice", (a, new DeviceConfig(""))))
+        // The deviceId is not use in this example
+        val deviceTimeRecord = inputStream.map(a => ("TestDevice", a))
 
-        // Setup the processing app, the projectId is not relevant
+        // Get an iobeam interface for local use
+        val interface = new AppRunnerInterface(deviceTimeRecord)
+
+        // Setup the processing app
         val app = new StreamProcessor()
 
         // Get the output from the app
-        val outputStreams = app.processStream(deviceTimeRecordConf)
+        val outputStreams = app.processStream(interface)
         val firstOutput = outputStreams.getTimeSeries.head
 
         // Catch the resulting RDDs and convert it to tuples for easy comparisons
