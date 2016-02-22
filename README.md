@@ -93,20 +93,19 @@ creating a new output stream. (For more complex examples, see the [iobeam exampl
 ```
 class StreamProcessor() extends SparkApp("MyAppName") {
 
-    def add1(dataAndConf: (TimeRecord, DeviceConfig)): TimeRecord = {
-        val (timeRecord, _) = dataAndConf
+    def add1(timeRecord: TimeRecord): TimeRecord = {
         val newValue = timeRecord.requireDouble("value") + 1
         val outputData = new TimeRecord(timeRecord.time, Map("value" -> newValue))
 
         outputData
     }
 
-    override def processStream(stream: DStream[(String, (TimeRecord, DeviceConfig))]):
+    override def processStream(iobeamInterface: IobeamInterface):
     OutputStreams = {
-
+        val stream = iobeamInterface.getInputStreamBySource
         val outStream = stream.mapValues(add1)
 
-        new OutputStreams(new TimeSeriesStreamPartitioned("out_stream", outStream))
+        new OutputStreams(new TimeSeriesStreamPartitioned(outStream))
     }
 }
 
