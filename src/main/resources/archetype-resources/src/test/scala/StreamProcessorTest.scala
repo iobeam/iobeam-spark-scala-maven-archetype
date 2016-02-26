@@ -1,6 +1,7 @@
 package org.apache.spark
 
-import com.iobeam.spark.streams.{AppRunnerInterface, StreamProcessor}
+import com.iobeam.spark.streams.AppRunnerInterface
+import ${package}.StreamProcessor
 import com.iobeam.spark.streams.model.TimeRecord
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.ClockWrapper
