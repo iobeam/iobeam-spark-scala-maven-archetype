@@ -4,7 +4,7 @@
 
     <groupId>com.iobeam</groupId>
     <artifactId>iobeam-spark-scala-maven-archetype</artifactId>
-    <version>0.4</version>
+    <version>0.5-SNAPSHOT</version>
     <packaging>maven-archetype</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -41,7 +41,7 @@
         <connection>scm:git:ssh://git@bitbucket.org/440-labs/iobeam-spark-scala-maven-archetype.git</connection>
         <developerConnection>scm:git:ssh://git@bitbucket.org/440-labs/iobeam-spark-scala-maven-archetype.git
         </developerConnection>
-        <tag>v0.4</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
