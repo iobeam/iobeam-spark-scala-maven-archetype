@@ -70,7 +70,7 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
-            <!-- disable surefire -->
+            <!-- Uncomment to run tests when building
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -79,7 +79,6 @@
                     <skipTests>true</skipTests>
                 </configuration>
             </plugin>
-            <!-- enable scalatest -->
             <plugin>
                 <groupId>org.scalatest</groupId>
                 <artifactId>scalatest-maven-plugin</artifactId>
@@ -98,6 +97,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
     </build>
     <dependencies>
@@ -126,14 +126,15 @@
         <dependency>
             <groupId>com.iobeam</groupId>
             <artifactId>iobeam-spark-scala</artifactId>
-            <version>0.3</version>
+            <version>${iobeam.spark.scala.version}</version>
         </dependency>
     </dependencies>
 
     <properties>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <spark.version>1.5.1</spark.version>
+        <spark.version>1.6.0</spark.version>
+        <iobeam.spark.scala.version>0.4</iobeam.spark.scala.version>
         <mockito.version>1.10.19</mockito.version>
         <junit.version>4.12</junit.version>
         <log4j.version>2.3</log4j.version>
