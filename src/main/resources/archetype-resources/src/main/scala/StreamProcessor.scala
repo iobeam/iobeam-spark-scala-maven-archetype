@@ -23,7 +23,7 @@ class StreamProcessor() extends SparkApp("${appName}") {
       * Simple trigger function. Returning empty Seq means no triggers. If more
       * than one field cause triggers, the Seq can contain multiple triggers.
       *
-      * @param timeRecord record to check
+      * @param deviceAndRecord record to check
       * @return Seq of trigger events
       */
     def checkTrigger(deviceAndRecord: (String, TimeRecord)): Seq[TriggerEvent] = {
