@@ -21,7 +21,7 @@ unit test framework.
 ## Setup
 
 ### Prerequisites
-* A recent [Maven installation](https://maven.apache.org/download.cgi#Installation)
+* A recent [Maven installation](https://maven.apache.org/download.cgi#Installation) (3.3+)
 * Scala 2.10
 * JDK 8 
 
