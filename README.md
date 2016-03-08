@@ -33,7 +33,7 @@ To set up the iobeam Spark app, you run the following command from your command-
 mvn archetype:generate \
 -DarchetypeArtifactId=iobeam-spark-scala-maven-archetype \
 -DarchetypeGroupId=com.iobeam \
--DarchetypeCatalog=https://oss.sonatype.org/content/repositories/releases/archetype-catalog.xml
+-DarchetypeCatalog=https://assets.iobeam.com/libs/archetype-catalog.xml
 ```
 Maven will ask for information unique to your app. At the minimum, you should set `groupId`,
 `artifactId`, and `appName`.
