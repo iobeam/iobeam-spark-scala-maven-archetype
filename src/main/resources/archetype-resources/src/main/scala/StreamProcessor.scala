@@ -1,20 +1,22 @@
 package ${package}
 
-import com.iobeam.spark.streams.{IobeamInterface, SparkApp}
-import com.iobeam.spark.streams.model.{TimeSeriesStreamPartitioned, OutputStreams, TimeRecord, TriggerEvent, TriggerStream}
+import com.iobeam.spark.streams.{AppContext, SparkApp}
+import com.iobeam.spark.streams.model.{OutputStreams, TimeRecord, TriggerEvent}
 import com.iobeam.spark.streams.annotation.SparkRun
 
 /**
   * Application to submit to iobeam
   */
-class StreamProcessor() extends SparkApp("${appName}") {
-
+@SparkRun("${appName}")
+object StreamProcessor extends SparkApp {
     /**
       * Simple example of processing function. Adds 1 to the field "value" and writes it to
       * the value-new series.
       */
     def add1(timeRecord: TimeRecord): TimeRecord = {
+
         val newValue = timeRecord.requireDouble("value") + 1
+
         // Create output series, make sure it uses a new series name
         new TimeRecord(timeRecord.time, Map("value-new" -> newValue))
     }
@@ -43,15 +45,16 @@ class StreamProcessor() extends SparkApp("${appName}") {
     /**
       * Sets up stream processing for project.
       *
-      * @param iobeamInterface interface to iobeam backend
+      * @param appContext interface to iobeam backend
       * @return Set of outputStreams
       */
-    override def processStream(iobeamInterface: IobeamInterface):
+
+    override def main(appContext: AppContext):
     OutputStreams = {
-        val stream = iobeamInterface.getInputStreamBySource
+        val stream = appContext.getInputStream
         val outStream = stream.mapValues(add1)
         val triggerStream = stream.flatMap(checkTrigger)
 
-        new OutputStreams(new TimeSeriesStreamPartitioned(outStream), TriggerStream(triggerStream))
+        OutputStreams(outStream, triggerStream)
     }
 }

@@ -1,10 +1,11 @@
 package org.apache.spark
 
-import com.iobeam.spark.streams.AppRunnerInterface
+import com.iobeam.spark.streams.AppContext
 import ${package}.StreamProcessor
 import com.iobeam.spark.streams.model.TimeRecord
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.ClockWrapper
+import org.apache.spark.streaming.dstream.DStream
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Span}
 import org.scalatest.{FlatSpec, GivenWhenThen, Matchers}
@@ -66,20 +67,17 @@ class StreamProcessorTest extends FlatSpec with Matchers with SparkStreamingSpec
         // The deviceId is not use in this example
         val deviceTimeRecord = inputStream.map(a => ("TestDevice", a))
 
-        // Get an iobeam interface for local use
-        val interface = new AppRunnerInterface(deviceTimeRecord)
-
-        // Setup the processing app
-        val app = new StreamProcessor()
-
         // Get the output from the app
-        val outputStreams = app.processStream(interface)
-        val firstOutput = outputStreams.getTimeSeries.head
+        val outputStreams = StreamProcessor.main(new AppContext {
+            override def getInputStream: DStream[(String, TimeRecord)] = deviceTimeRecord
+        })
+
+        val firstOutput = outputStreams.getTimeSeriesDStreams.head
 
         // Catch the resulting RDDs and convert it to tuples for easy comparisons
-        firstOutput.getDStream.foreachRDD {
+        firstOutput.foreachRDD {
             rdd => results.append(
-                rdd.map(a => (a._2.time, a._2.requireDouble("value")))
+                rdd.map(a => (a._2.time, a._2.requireDouble("value-new")))
                     .collect().toList)
         }
 
@@ -101,4 +99,3 @@ class StreamProcessorTest extends FlatSpec with Matchers with SparkStreamingSpec
         ssc.stop()
     }
 }
-
