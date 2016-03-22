@@ -8,7 +8,7 @@ or an event to trigger an action using our Trigger service.
 
 This repo describes how to write an iobeam Spark app. [The full reference API
 can be found
-here](http://assets.iobeam.com/libs/spark/scala/#com.iobeam.spark.streams.package).
+here](http://assets.iobeam.com/libs/spark/scala/index.html#com.iobeam.spark.streams.package).
 
 # Writing your first iobeam Spark app
 The first step to develop a custom iobeam
