@@ -36,14 +36,13 @@ mvn archetype:generate \
 -DarchetypeCatalog=https://assets.iobeam.com/libs/archetype-catalog.xml
 ```
 Maven will ask for information unique to your app. At the minimum, you should set `groupId`,
-`artifactId`, and `appName`.
+`artifactId`.
 
 ```
 Define value for property 'groupId': : com.mycompany
 Define value for property 'artifactId': : myappId
 Define value for property 'version':  1.0-SNAPSHOT: : [Enter for default] 
 Define value for property 'package':  com.mycompany: : [Enter for default] 
-Define value for property 'appName': : MyAppName
 Confirm properties configuration:
 groupId: com.mycompany
 artifactId: myappId
@@ -80,22 +79,23 @@ target/myappId-1.0-SNAPSHOT.jar
 ```
 
 ## Writing your app
-The first files to modify are the main analysis class and the corresponding unit tests.
+The first files to modify are the main analysis class and if you choose to use it,
+the class containing the corresponding unit tests. Modify the pom.xml to activate tests.
 ```
-src/main/scala/com/mycompany/Spark/streams/StreamProcessor.scala
-src/test/scala/com/mycompany/Spark/streams/StreamProcessorTest.scala
+src/main/scala/com/mycompany/apps/MyApp.scala
+src/test/scala/com/mycompany/apps/AppsTest.scala
 ```
 
 ### Analysis code
-The analysis of the streaming data is defined in ```StreamProcessor.scala```. The main
-function is the `processStream` method, which you will need to override. 
+The analysis of the streaming data is defined in ```MyApp.scala```. The main
+function is the `main` method, which you will need to override. 
 
-The example code provided simply adds 1 to all values coming through the stream processing,
-creating a new output stream. (For more complex examples, see the [iobeam examples repo](https://github.com/iobeam/iobeam-spark-scala-examples).)
+The example app AddOne provided simply adds 1 to all values coming through the stream processing,
+creating a new output stream. 
 
 ```
-@SparkRun("MyApp")
-object StreamProcessor extends SparkApp {
+@SparkRun("AddOne")
+object AddOne extends SparkApp {
     /**
       * Simple example of processing function. Adds 1 to the field "value" and writes it to
       * the value-new series.
@@ -148,12 +148,48 @@ object StreamProcessor extends SparkApp {
 
 ```
 
+And a Device Ops example. [More information about Device Ops](DeviceOps.md)
+
+```
+@SparkRun("deviceOps")
+object DeviceOpsApp extends SparkApp {
+
+    override def main(appContext: AppContext):
+    OutputStreams = {
+        // Get raw input data
+        val stream = appContext.getInputStream
+
+        // Build device ops config
+        val config = new DeviceOpsConfigBuilder()
+            // smooth the input series cpu with a EWMA filter with alpha 0.2
+            .addSeriesFilter("cpu", "cpu_smoothed", new Ewma(0.2))
+            // Add a threshold trigger to the series
+            .addSeriesTrigger("cpu_smoothed", new ThresholdTrigger(90.0, "cpu_over_90", 70,
+            "cpu_below_70"))
+            // Add a threshold timeout trigger
+            .addSeriesTrigger("cpu_smoothed",
+            new ThresholdTimeoutTrigger(85.0, 70.0, Milliseconds(5000), "cpu_over_85_for_5_s",
+                "cpu_restored"))
+            // Add check of when devices go offline
+            .addDeviceTrigger(new DeviceTimeoutTrigger(Minutes(5), "device offline"))
+            .build
+
+        val (outStream, triggers) = DeviceOps.getDeviceOpsOutput(stream, config)
+
+        // Output streams
+        OutputStreams(outStream, triggers)
+    }
+}
+```
+There's also another example included that converts the temperature from Celsius to 
+Fahrenheit: TemperatureConversionApp.scala.
+
 ### Test code
 To help development, the Scala test framework is included in the
 app together with Spark and Spark streaming specs.
 
 Modify
-```src/test/scala/com/mycompany/Spark/streams/StreamProcessorTest.scala``` to
+```src/test/scala/com/mycompany/Spark/streams/AppsTest.scala``` to
 match your new analysis code. The TestDataSet is used for easy initialization
 of test data and can be extended to match the data format of the iobeam app.
 
@@ -162,7 +198,7 @@ to be initialised with new input batches and the ```correctOutput```list needs
 to contain the expected output.
 
 ```
-class StreamProcessorTest extends FlatSpec with SparkStreamingSpec with Matchers with
+class AddOneTest extends FlatSpec with SparkStreamingSpec with Matchers with
 BeforeAndAfter with GivenWhenThen with Eventually {
 
     val batches = List(
@@ -195,5 +231,18 @@ BeforeAndAfter with GivenWhenThen with Eventually {
 ...
 ```
 
+## Run code on iobeam
+
+To run the addOne example app
+```
+iobeam app create -name addOne -path target/myjarfile.jar 
+```
+
+To run the Device Ops app
+```
+iobeam app create -name deviceOps -path target/myjarfile.jar 
+
+```
+(Note: Both apps will be contained in the same jar file.)
 # Support
 Questions? Please reach out to us at [support@iobeam.com](mailto:support@iobeam.com).

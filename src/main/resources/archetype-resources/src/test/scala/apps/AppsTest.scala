@@ -1,7 +1,7 @@
 package org.apache.spark
 
+import ${package}.examples.AddOneApp
 import com.iobeam.spark.streams.AppContext
-import ${package}.StreamProcessor
 import com.iobeam.spark.streams.model.TimeRecord
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.ClockWrapper
@@ -21,7 +21,7 @@ class TestTimeRecord(override val time: Long,
     def getValue: Double = value
 }
 
-class StreamProcessorTest extends FlatSpec with Matchers with SparkStreamingSpec with GivenWhenThen with Eventually {
+class AddOneAppTest extends FlatSpec with Matchers with SparkStreamingSpec with GivenWhenThen with Eventually {
 
     val batches = List(
         List(
@@ -68,7 +68,7 @@ class StreamProcessorTest extends FlatSpec with Matchers with SparkStreamingSpec
         val deviceTimeRecord = inputStream.map(a => ("TestDevice", a))
 
         // Get the output from the app
-        val outputStreams = StreamProcessor.main(new AppContext {
+        val outputStreams = AddOneApp.main(new AppContext {
             override def getInputStream: DStream[(String, TimeRecord)] = deviceTimeRecord
         })
 
