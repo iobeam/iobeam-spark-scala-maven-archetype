@@ -1,14 +1,14 @@
-package ${package}
+package ${package}.examples
 
-import com.iobeam.spark.streams.{AppContext, SparkApp}
-import com.iobeam.spark.streams.model.{OutputStreams, TimeRecord, TriggerEvent}
 import com.iobeam.spark.streams.annotation.SparkRun
+import com.iobeam.spark.streams.model.{OutputStreams, TimeRecord, TriggerEvent}
+import com.iobeam.spark.streams.{AppContext, SparkApp}
 
 /**
-  * Application to submit to iobeam
+  * Simple app used to demonstrate unit testing.
   */
-@SparkRun("${appName}")
-object StreamProcessor extends SparkApp {
+@SparkRun("addOne")
+object AddOneApp extends SparkApp {
     /**
       * Simple example of processing function. Adds 1 to the field "value" and writes it to
       * the value-new series.
@@ -35,7 +35,8 @@ object StreamProcessor extends SparkApp {
 
         if (value > myThreshold) {
             return Seq(new TriggerEvent("myEventName",
-                new TimeRecord(timeRecord.time, Map("triggeredValue" -> value, "deviceId" -> deviceId))))
+                new TimeRecord(timeRecord.time, Map("triggeredValue" -> value, "deviceId" ->
+                    deviceId))))
         }
 
         // Not a trigger in this record

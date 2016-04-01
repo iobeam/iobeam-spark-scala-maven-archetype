@@ -11,13 +11,6 @@
     <version>${version}</version>
     <name>iobeam spark app</name>
 
-    <organization>
-        <name>440 Labs, Inc.</name>
-        <url>http://www.iobeam.com/</url>
-    </organization>
-
-    <inceptionYear>2016</inceptionYear>
-
     <build>
         <resources>
             <resource>
@@ -125,7 +118,12 @@
         </dependency>
         <dependency>
             <groupId>com.iobeam</groupId>
-            <artifactId>iobeam-spark-scala</artifactId>
+            <artifactId>iobeam-spark-scala-core</artifactId>
+            <version>${iobeam.spark.scala.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.iobeam</groupId>
+            <artifactId>iobeam-spark-scala-deviceops</artifactId>
             <version>${iobeam.spark.scala.version}</version>
         </dependency>
     </dependencies>
@@ -134,7 +132,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <spark.version>1.6.0</spark.version>
-        <iobeam.spark.scala.version>0.6</iobeam.spark.scala.version>
+        <iobeam.spark.scala.version>0.7</iobeam.spark.scala.version>
         <mockito.version>1.10.19</mockito.version>
         <junit.version>4.12</junit.version>
         <log4j.version>2.3</log4j.version>
