@@ -20,53 +20,65 @@ A common use of the trigger system is to generate events when a certain metric p
 For example when the battery level of a device is below a defined level. To setup a trigger for when 
 the series named "battery" is below 10 %, you setup a ThresholdTrigger:
 
-Builder().
-addTrigger("battery", ThresholdTrigger(10.0, "Battery below 10%", 15.0)).build()
-
-where 10.0 is the threshold level and 15.0 is the trigger release level. This hysteresis 
-means that the trigger will not create multiple events if the battery readings oscillate around the 
+```scala
+new DeviceOpsConfigBuilder()
+  .addTrigger("battery", ThresholdTrigger(10.0, "Battery below 10%", 15.0))
+  .build
+```
+where `10.0` is the threshold level (or "low-watermark") and `15.0` is the trigger release level (or "high watermark"). 
+This hysteresis means that the trigger will not create multiple events if the battery readings oscillate around the 
 trigger level. 
 
 ### Monitor when CPU is above threshold and when it goes below another threshold
 
 When monitoring a metric where you are interested both when it enters and leaves a problematic area, 
-such as high CPU, you configure the threshold trigger
+such as high CPU, you configure the threshold trigger:
+```scala
+new DeviceOpsConfigBuilder()
+  .addTrigger("cpu", ThresholdTrigger(90.0, "CPU above 90%", 70.0, "CPU below 70%"))
+  .build
+```
 
-new DeviceMonitoringConfigurationBuilder().  
-addTrigger("cpu", ThresholdTrigger(90.0,"CPU above 90%", 70.0, "CPU below 70%")).build()
-
-This will create a trigger event when the cpu readings go above 90% and another event when the series 
-go below 70 %
+This will create a trigger event when the CPU readings go above `90%` and another event when the series 
+go below `70%`.
 
 ### High CPU load for extended period
 
-To set a threshold trigger that detects when a series is above a threshold longer than a timeout, 
+To set a threshold trigger that detects when a series (e.g. `cpu`) is above a threshold longer than a time limit:
+```scala
+new DeviceOpsConfigBuilder()
+  .addTrigger("cpu", ThresholdTimeoutTrigger(70.0, 50.0, Seconds(30), "Above threshold >30s"))
+  .build
+```
 
-Builder().
-addTrigger("Series name", ThresholdTimeoutTrigger(0.7, 0.5, Seconds(30), "Above threshold longer than 30 s")).build
+This will create a trigger when CPU readings remove above `70%` without dipping below `50%` for over 30secs. 
 
 ### Detect quickly changing series
 
 Detecting quick changes in series can be done by connecting a threshold trigger to a derivative filter. 
-
-new DeviceMonitoringConfigurationBuilder().  
-addFilter("cpu", "cpu_derived", Filter.DeriveFilter).
-addTrigger("cpu_derived", ThresholdTrigger(1.0,"CPU increase high", 0.0 , "CPU leveled out"))
+```scala
+new DeviceOpsConfigBuilder()
+  .addFilter("cpu", "cpu_derived", Filter.DeriveFilter)
+  .addTrigger("cpu_derived", ThresholdTrigger(1.0, "CPU increase high", 0.0, "CPU leveled out"))
+  .build
+```
 
 As noise on a series can make the derivative very jumpy, a smoothing filter can be applied before
-  
-new DeviceMonitoringConfigurationBuilder().  
-addFilter("noisy_series", "smoothed_series", new Ewma(0.1))).
-addFilter("smoothed_series", "series_derived", new DeriveFilter).
-addTrigger("series_derived", new ThresholdTrigger(1.0,"Series increase high", 0.0 , "Series leveled out"))
-.build()
-  
-For irregular sampled series, EwmaIrregular can be used instead.  
+```scala
+new DeviceOpsConfigBuilder()
+  .addFilter("noisy_series", "smoothed_series", new Ewma(0.1)))
+  .addFilter("smoothed_series", "series_derived", new DeriveFilter)
+  .addTrigger("series_derived", new ThresholdTrigger(1.0, "Series increase high", 0.0, "Series leveled out"))
+  .build
+```
+
+For irregularly sampled series, `EwmaIrregular` can be used instead.  
 
 ### Device offline
 
 Detecting when a device has gone offline, i.e., last sent data to iobeam longer than a specific timeout threshold.
-
-new DeviceMonitoringConfigurationBuilder()
-.addDeviceTrigger(new DeviceTimeoutTrigger(Minutes(5), "device offline"))
-.build
+```scala
+new DeviceOpsConfigBuilder()
+  .addDeviceTrigger(new DeviceTimeoutTrigger(Minutes(5), "device offline"))
+  .build
+```
