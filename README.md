@@ -6,11 +6,18 @@ complex prediction, anomaly detection, classification, and other ML-driven
 models. The output of an iobeam Spark app can be a new stream of derived data,
 or an event to trigger an action using our Trigger service.
 
-This repo describes how to write an iobeam Spark app. [The full reference API
-can be found
-here](http://assets.iobeam.com/libs/spark/scala/index.html#com.iobeam.spark.streams.package).
+This repo describes how to write an iobeam Spark app.  Some developers
+might be using iobeam for their entire data pipeline, while others'
+first introduction to iobeam will be for "device ops" and telemetry.
+
+This same repo and maven archetype can be used for either, and more
+information about these two scenarios can be found at the following:
+
+* [Full reference API for iobeam's Spark interface](http://assets.iobeam.com/libs/spark/scala/index.html#com.iobeam.spark.streams.package)
+* [iobeam's native support for DeviceOps](DeviceOps.md)
 
 # Writing your first iobeam Spark app
+
 The first step to develop a custom iobeam
 Spark app is to set up up a Scala app with the right Spark and iobeam
 dependencies. To automate this, iobeam provides a [Maven
@@ -79,26 +86,39 @@ target/myappId-1.0-SNAPSHOT.jar
 ```
 
 ## Writing your app
-The first files to modify are the main analysis class and if you choose to use it,
+The first file to modify is the main analysis class, and if you choose to use it,
 the class containing the corresponding unit tests. Modify the pom.xml to activate tests.
 ```
 src/main/scala/com/mycompany/apps/MyApp.scala
 src/test/scala/com/mycompany/apps/AppsTest.scala
 ```
 
+There are three simple example applications under an examples
+subdirectory (`src/main/scala/com/mycompany/apps/examples/`):
+
+* **AddOneApp** simply adds 1 to each value of a stream, creating a
+    new output stream of these modifies values. Generates an alert if
+    the result in above some threshold.
+
+* **TemperatureConversionApp** converts a stream of Celsius readings
+    to a stream of Fahrenheit temperatures. Generates an alert if the
+    temperature is too high.
+
+* **DeviceOpsApp** provides the stream processing basis for rich [device
+    ops](DeviceOps.md) functionality, including alerting.
+
 ### Analysis code
 The analysis of the streaming data is defined in ```MyApp.scala```. The main
 function is the `main` method, which you will need to override. 
 
-The example app AddOne provided simply adds 1 to all values coming through the stream processing,
-creating a new output stream. 
+For example, the example **AddOneApp* is defined as the following:
 
 ```
 @SparkRun("AddOne")
 object AddOne extends SparkApp {
     /**
-      * Simple example of processing function. Adds 1 to the field "value" and writes it to
-      * the value-new series.
+      * Simple example of processing function. Adds 1 to the field "value" and
+      * writes it to the value-new series.
       */
     def add1(timeRecord: TimeRecord): TimeRecord = {
 
@@ -122,7 +142,8 @@ object AddOne extends SparkApp {
 
         if (value > myThreshold) {
             return Seq(new TriggerEvent("myEventName",
-                new TimeRecord(timeRecord.time, Map("triggeredValue" -> value, "deviceId" -> deviceId))))
+                new TimeRecord(timeRecord.time,
+                               Map("triggeredValue" -> value, "deviceId" -> deviceId))))
         }
 
         // Not a trigger in this record
@@ -135,7 +156,6 @@ object AddOne extends SparkApp {
       * @param appContext interface to iobeam backend
       * @return Set of outputStreams
       */
-
     override def main(appContext: AppContext):
     OutputStreams = {
         val stream = appContext.getInputStream
@@ -148,7 +168,7 @@ object AddOne extends SparkApp {
 
 ```
 
-And a Device Ops example. [More information about Device Ops](DeviceOps.md)
+The **DeviceOpsApp** makes heavy use of [iobeam's native support for DeviceOps](DeviceOps.md), including series filtering and triggers.
 
 ```
 @SparkRun("deviceOps")
@@ -181,8 +201,6 @@ object DeviceOpsApp extends SparkApp {
     }
 }
 ```
-There's also another example included that converts the temperature from Celsius to 
-Fahrenheit: TemperatureConversionApp.scala.
 
 ### Test code
 To help development, the Scala test framework is included in the

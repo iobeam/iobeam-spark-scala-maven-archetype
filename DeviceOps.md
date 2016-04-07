@@ -1,6 +1,27 @@
 # Iobeam Device Ops spark app
 
-Stateful series processing with filtering and triggers
+iobeam provides library support for common operations associated with
+DeviceOps, including stateful series processing with filtering and
+triggers.
+
+The input to a DeviceOps application is a stream of measurements
+(e.g., cpu, battery levels, memory consumption, etc.), while the
+output will be a derived stream (the result of processing and
+filtering the incoming measurement stream) and a stream of [events to
+be triggered](https://docs.iobeam.com/triggering-on-data).
+
+This library provides a *DeviceOpsConfigBuilder* that allows one to
+perform simple stream processing in just a few lines of configuration,
+including common stateful transformations (e.g., computing
+exponentially-weighted moving averages, derivations, etc.), filters
+(e.g., simple thresholds, time-based stateful conditions, etc.)  and
+event generation.
+
+To write a DeviceOps app using iobeam:
+
+* First, create a iobeam app [using these instructions](README.md).
+* Second, copy the *main* function from the DeviceOps example from `examples/DeviceOpsApp.scala` to [your application](README.md#writing-your-app).
+* Third, modify and extend your app's functionality using the below instructions.
 
 ### Filters
 
