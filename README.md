@@ -253,12 +253,12 @@ BeforeAndAfter with GivenWhenThen with Eventually {
 
 To run the addOne example app
 ```
-iobeam app create -name addOne -path target/myjarfile.jar 
+iobeam app create -name addOne -path target/myappId-1.0-SNAPSHOT.jar
 ```
 
 To run the Device Ops app
 ```
-iobeam app create -name deviceOps -path target/myjarfile.jar 
+iobeam app create -name deviceOps -path target/myappId-1.0-SNAPSHOT.jar
 
 ```
 (Note: Both apps will be contained in the same jar file.)
