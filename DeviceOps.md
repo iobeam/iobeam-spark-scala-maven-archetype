@@ -247,7 +247,7 @@ For irregularly sampled series, `EwmaIrregular` can be used instead.
 Detecting when a device has gone offline, i.e., last sent data to iobeam longer than a specific timeout threshold.
 ```scala
 new DeviceOpsConfigBuilder()
-  .addDeviceTrigger(new DeviceTimeoutTrigger(Minutes(5), "device offline"))
+  .addDeviceTrigger(new DeviceTimeoutTrigger(Minutes(5), "device_offline"))
   .build
 ```
 

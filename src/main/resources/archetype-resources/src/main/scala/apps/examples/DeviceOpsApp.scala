@@ -30,7 +30,7 @@ object DeviceOpsApp extends SparkApp {
             new ThresholdTimeoutTrigger(85.0, 70.0, Seconds(5), "cpu_over_85_for_5_s",
                 "cpu_restored"))
             // Add check of when devices go offline
-            .addDeviceTrigger(new DeviceTimeoutTrigger(Minutes(5), "device offline"))
+            .addDeviceTrigger(new DeviceTimeoutTrigger(Minutes(5), "device_offline"))
             .build
 
         val (outStream, triggers) = DeviceOps.getDeviceOpsOutput(stream, config)
