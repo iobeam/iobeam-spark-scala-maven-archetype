@@ -203,10 +203,11 @@ Now that we've deployed the stock device ops app, you can now extend the
 program according to your needs.  Either edit the example in-place, or
 copy the *main* function to `MyApp.scala`.
 
-To redeploy your app, run the update command. Include the `-name` parameter if you modified
-the main function in `MyApp.scala`.
+To redeploy your app, run `mvn clean package` and then run the update command. 
+Include the `-name` parameter if you modified the main function in `MyApp.scala`.
 
 ```
+mvn clean package
 iobeam app update -id [your_app_id] -name myApp -path target/myApp-1.0-SNAPSHOT.jar
 ```
 
@@ -266,7 +267,7 @@ This will create a trigger when CPU readings remove above `70%` without dipping 
 Detecting quick changes in series can be done by connecting a threshold trigger to a derivative filter.
 ```scala
 new DeviceOpsConfigBuilder()
-  .addFilter("cpu", "cpu_derived", Filter.DeriveFilter)
+  .addFilter("cpu", "cpu_derived", new DerivativeFilter)
   .addTrigger("cpu_derived", ThresholdTrigger(1.0, "CPU increase high", 0.0, "CPU leveled out"))
   .build
 ```
@@ -275,7 +276,7 @@ As noise on a series can make the derivative very jumpy, a smoothing filter can 
 ```scala
 new DeviceOpsConfigBuilder()
   .addFilter("noisy_series", "smoothed_series", new Ewma(0.1)))
-  .addFilter("smoothed_series", "series_derived", new DeriveFilter)
+  .addFilter("smoothed_series", "series_derived", new DerivativeFilter)
   .addTrigger("series_derived", new ThresholdTrigger(1.0, "Series increase high", 0.0, "Series leveled out"))
   .build
 ```
