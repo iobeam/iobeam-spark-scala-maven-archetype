@@ -1,4 +1,17 @@
-# Device Ops Application
+# Device Ops Library
+
+iobeam library for common DeviceOps operations.
+
+## Before you begin
+
+Prerequisites for using the DeviceOps library:
+
+1. [Install the iobeam command-line interface](https://github.com/iobeam/iobeam)
+
+1. [Generate the framework for an iobeam Spark app](README.md#setup)
+(includes DeviceOps sample app)
+
+## Introduction
 
 iobeam provides library support for common operations associated with
 DeviceOps, including stateful series processing with filtering and
