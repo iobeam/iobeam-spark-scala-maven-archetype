@@ -243,7 +243,7 @@ the series named "battery" is below 10%, you set up a ThresholdTrigger:
 
 ```scala
 new DeviceOpsConfigBuilder()
-  .addTrigger("battery", ThresholdTrigger(10.0, "Battery below 10%", 15.0))
+  .addSeriesTrigger("battery", new ThresholdTrigger(10.0, "battery_below_10", 15.0))
   .build
 ```
 where `10.0` is the threshold level (or "low watermark") and `15.0` is the trigger release level (or "high watermark").
@@ -257,7 +257,7 @@ When monitoring a metric where you are interested both when it enters and leaves
 such as high CPU, you configure the threshold trigger:
 ```scala
 new DeviceOpsConfigBuilder()
-  .addTrigger("cpu", ThresholdTrigger(90.0, "CPU above 90%", 70.0, "CPU below 70%"))
+  .addSeriesTrigger("cpu", new ThresholdTrigger(90.0, "cpu_above_90", 70.0, "cpu_below_70"))
   .build
 ```
 
@@ -269,7 +269,7 @@ go below `70%`.
 To set a threshold trigger that detects when a series (e.g. `cpu`) is above a threshold longer than a time limit:
 ```scala
 new DeviceOpsConfigBuilder()
-  .addTrigger("cpu", ThresholdTimeoutTrigger(70.0, 50.0, Seconds(30), "Above threshold >30s"))
+  .addSeriesTrigger("cpu", new ThresholdTimeoutTrigger(70.0, 50.0, Seconds(30), "above_threshold_30s"))
   .build
 ```
 
@@ -280,17 +280,17 @@ This will create a trigger when CPU readings remove above `70%` without dipping 
 Detecting quick changes in series can be done by connecting a threshold trigger to a derivative filter.
 ```scala
 new DeviceOpsConfigBuilder()
-  .addFilter("cpu", "cpu_derived", new DerivativeFilter)
-  .addTrigger("cpu_derived", ThresholdTrigger(1.0, "CPU increase high", 0.0, "CPU leveled out"))
+  .addSeriesFilter("cpu", "cpu_derived", new DerivativeFilter)
+  .addSeriesTrigger("cpu_derived", ThresholdTrigger(1.0, "cpu_increase_high", 0.0, "cpu_leveled_out"))
   .build
 ```
 
 As noise on a series can make the derivative very jumpy, a smoothing filter can be applied before
 ```scala
 new DeviceOpsConfigBuilder()
-  .addFilter("noisy_series", "smoothed_series", new Ewma(0.1)))
-  .addFilter("smoothed_series", "series_derived", new DerivativeFilter)
-  .addTrigger("series_derived", new ThresholdTrigger(1.0, "Series increase high", 0.0, "Series leveled out"))
+  .addSeriesFilter("noisy_series", "smoothed_series", new Ewma(0.1)))
+  .addSeriesFilter("smoothed_series", "series_derived", new DerivativeFilter)
+  .addSeriesTrigger("series_derived", new ThresholdTrigger(1.0, "series_increase_high", 0.0, "series_leveled_out"))
   .build
 ```
 
