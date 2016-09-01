@@ -64,38 +64,38 @@ The app also generates various trigger events named:
   */
 @SparkRun("deviceOps")
 object DeviceOpsApp extends SparkApp {
-
-    override def main(appContext: AppContext):
-    OutputStreams = {
-
-        // Get raw input data
-        val stream = appContext.getInputStream
-
-        // Build device ops config
-        val config = new DeviceOpsConfigBuilder()
-            // smooth the input series cpu with a EWMA filter with alpha 0.2
-            .addSeriesFilter("cpu", "cpu_smoothed", new Ewma(0.2))
-
-            // Add a threshold trigger to the series
-            .addSeriesTrigger("cpu_smoothed",
-                new ThresholdTrigger(90.0, "cpu_over_90",
-                                     70.0, "cpu_below_70"))
-
-            // Add a threshold timeout trigger
-            .addSeriesTrigger("cpu_smoothed",
-                new ThresholdTimeoutTrigger(85.0, 70.0, Seconds(5),
-                  "cpu_over_85_for_5_s", "cpu_restored"))
-
-            // Add check of when devices go offline
-            .addDeviceTrigger(new DeviceTimeoutTrigger(Minutes(5), "device_offline"))
-            .build
-
-        val (outStream, triggers) = DeviceOps.getDeviceOpsOutput(stream, config)
-
-        // Output streams
-        OutputStreams(outStream, triggers)
+    
+        override def main(appContext: AppContext):
+        OutputStreams = {
+            // Get raw input data
+            val stream = appContext.getData("input")
+    
+            // Build device ops config
+            val config = new DeviceOpsConfig()
+                // smooth the input series cpu with a EWMA filter with alpha 0.2
+                .addFieldTransform("cpu", "cpu_smoothed", new Ewma(0.2))
+                // Add a threshold trigger to the series
+                // where device_ops is the namespace and cpu_smoothed is the field to output.
+                // Write the trigger events to the same namespace in the field cpu_triggers
+                .addFieldTransform("device_ops", "cpu_smoothed", "device_ops", "cpu_triggers", 
+                new ThresholdTrigger(90.0, "cpu_over_90", 70, "cpu_below_70"))
+                // Add a threshold timeout trigger
+                .addFieldTransform("cpu", "cpu_triggers",
+                new ThresholdTimeoutTrigger(85.0, 70.0, Seconds(5), "cpu_over_85_for_5_s",
+                    "cpu_restored"))
+                // Add check of when devices go offline
+                .addNamespaceTransform("input", "device_status", "timeouts", new DeviceTimeoutTrigger
+            (Minutes(5), "device_offline"))
+    
+            val outStream = DeviceOps.getDeviceOpsOutput(stream, config)
+            stream.foreachRDD(rdd => {
+                println("Batch in")
+                rdd.foreach(tr => println(s"TR in: $tr"))
+            })
+    
+            OutputStreams(outStream)
+        }
     }
-}
 ```
 
 ## Building, Deploying, and Testing your App
@@ -123,14 +123,15 @@ for more detailed info.
 E.g., to send an email to yourself when the example app detects the CPU above 90% (event `cpu_over_90`), use the following command:
 
 ```
-iobeam trigger create email -name "cpu_over_90" \
-  -payload "The CPU of device {{ .deviceId }} is above 90%" \
-  -subject "High CPU" -to [your_email_address]
+iobeam trigger create email -name "cpu_over_90"  \
+    -payload "The CPU of device {{ .device_id }} is above 90%" \
+    -fireWhen "{{ cpu_trigger }} == \"cpu_over_90\"" -subject "High CPU" -to 
+    -to [your_email_address]
 ```
 
 And then to test that your trigger works:
 ```
-iobeam trigger test -name "cpu_over_90" -param "deviceId,this-is-just-a-test-device"
+iobeam import -namespace device_ops -fields cpu_triggers -values \"cpu_over_90\" -label device_id=\"CLI\" 
 ```
 
 ### Sending test data
@@ -140,20 +141,20 @@ For a full end-to-end test, we'll need to send some test data:
 ```
 iobeam device create -id DeviceOps-Test-1
 for v in 85 95 99 99 50 ; do
-   iobeam import -deviceId DeviceOps-Test-1 -series cpu -value $v ;
+   iobeam import -label deviceId=\"DeviceOps-Test-1\" -fields cpu -values $v ;
 done
 ```
 
 You can verify that this data was received:
 
 ```
-iobeam query -deviceId DeviceOps-Test-1 -series cpu
+iobeam query
 ```
 
 In fact, you can even query the system to determine when some condition occurs:
 
 ```
-iobeam query -deviceId DeviceOps-Test-1 -series cpu_over_90
+iobeam query -where "eq(deviceId,DeviceOps-Test-1)" -series cpu_over_90
 
 {
   "result": [
@@ -173,12 +174,17 @@ iobeam query -deviceId DeviceOps-Test-1 -series cpu_over_90
 }
 ```
 
-For an overall view of the raw data received and derived data created by
-the Device Ops app:
+For an overall view of the raw data received:
 
 ```
-iobeam query -deviceId DeviceOps-Test-1 -output csv
+iobeam query -output csv
 ```
+
+For an overall view of the derived data:
+```
+iobeam query -namespace device_ops -output csv
+```
+
 
 Because the stock example generates an event whenever the device is offline
 for more than 5 minutes (which can also be tied to a trigger), you should

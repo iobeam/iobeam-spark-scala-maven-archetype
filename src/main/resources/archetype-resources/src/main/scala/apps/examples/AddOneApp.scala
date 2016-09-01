@@ -52,10 +52,8 @@ object AddOneApp extends SparkApp {
 
     override def main(appContext: AppContext):
     OutputStreams = {
-        val stream = appContext.getInputStream
-        val outStream = stream.mapValues(add1)
-        val triggerStream = stream.flatMap(checkTrigger)
-
-        OutputStreams(outStream, triggerStream)
+        val stream = appContext.getData("input")
+        val outStream = stream.map(add1)
+        OutputStreams(("output_namespace", "device_id", outStream))
     }
 }

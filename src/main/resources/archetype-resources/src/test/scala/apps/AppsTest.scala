@@ -3,6 +3,7 @@ package org.apache.spark
 import ${package}.examples.AddOneApp
 import com.iobeam.spark.streams.AppContext
 import com.iobeam.spark.streams.model.TimeRecord
+import com.iobeam.spark.streams.model.namespaces.DataQuery
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.ClockWrapper
 import org.apache.spark.streaming.dstream.DStream
@@ -64,20 +65,18 @@ class AddOneAppTest extends FlatSpec with Matchers with SparkStreamingSpec with 
         // Create the QueueInputDStream and use it do some processing
         val inputStream = ssc.queueStream(batchQueue)
 
-        // The deviceId is not use in this example
-        val deviceTimeRecord = inputStream.map(a => ("TestDevice", a))
-
         // Get the output from the app
         val outputStreams = AddOneApp.main(new AppContext {
-            override def getInputStream: DStream[(String, TimeRecord)] = deviceTimeRecord
+            override def getData(query: DataQuery): DStream[TimeRecord] = inputStream
+            override def getData(namespaceName: String): DStream[TimeRecord] = inputStream
         })
 
-        val firstOutput = outputStreams.getTimeSeriesDStreams.head
+        val firstOutput = outputStreams.streams.head
 
         // Catch the resulting RDDs and convert it to tuples for easy comparisons
         firstOutput.foreachRDD {
             rdd => results.append(
-                rdd.map(a => (a._2.time, a._2.requireDouble("value-new")))
+                rdd.map(a => (a.time, a.requireDouble("value-new")))
                     .collect().toList)
         }
 

@@ -18,19 +18,13 @@ object MyApp extends SparkApp {
 
     override def main(appContext: AppContext): OutputStreams = {
         // This is where you read the input data.
-        val stream = appContext.getInputStream
-
+        val stream = appContext.getData("input")
         //
         // This is where you put your custom analysis.
         //
 
         // Change this line to fit your project. (Example below just drops all data.)
         val output = stream.filter(a => false)
-        OutputStreams(output)
+        OutputStreams(("output","device_id", output))
     }
 }
-
-
-
-
-
